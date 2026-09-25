@@ -5,13 +5,14 @@
 double getCircle(double r)
 {
 	double radius;
+	return radius;
 }
 
 
 int main()
 {
-	double c_r1 = getCircle(number1);
-	double c_r2 = getCircle(number2);
+	double c_r1 = getCircle(num1);
+	double c_r2 = getCircle(num2);
 
 	if (c_r1 > c_r2)
 	{
