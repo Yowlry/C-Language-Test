@@ -13,8 +13,8 @@ int main()
 {
 	// 1. 调用函数去求矩形的面积
 	// 1. Call a function to calculate the area of the rectangle
-	double area1 = getArea1(number1, number2);
-	double area2 = getArea1(number3, number4);
+	double area1 = getArea(num1, num2);
+	double area2 = getArea(num3, num4);
 
 	// 2. 判断
 	// 2. Determine
