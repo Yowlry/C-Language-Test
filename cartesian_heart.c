@@ -2,24 +2,32 @@
 
 int main()
 {
-    // 1. ÉèÖÃÑÕÉ«ÎªºìÉ« (ANSI Escape Code)
+    // 1. è®¾ç½®é¢œè‰²ä¸ºçº¢è‰² (ANSI Escape Code)
+    // 1. Set text color to red (ANSI Escape Code)
     printf("\033[31m");
 
-    // 2. ×İÏò²½³¤0.1£¬ºáÏò²½³¤0.05 (2:1 ±ÈÀıÊÊÅä)
-    // y´Ó1.5ÏÂ½µµ½-1.5 (´ÓÉÏÍùÏÂ´òÓ¡)
+    // 2. çºµå‘æ­¥é•¿0.1ï¼Œæ¨ªå‘æ­¥é•¿0.05 (2:1 æ¯”ä¾‹é€‚é…)
+    // yä»1.5ä¸‹é™åˆ°-1.5 (ä»ä¸Šå¾€ä¸‹æ‰“å°)
+    // 2. Vertical step size 0.1, horizontal step size 0.05 (2:1 aspect ratio adaptation)
+    // y decreases from 1.5 to -1.5 (prints top to bottom)
     for (float y = 1.5f; y > -1.5f; y -= 0.1f)
     {
 
-        // x´Ó-1.5Ôö¼Óµ½1.5(´Ó×óÍùÓÒ´òÓ¡)
+        // xä»-1.5å¢åŠ åˆ°1.5(ä»å·¦å¾€å³æ‰“å°)
+        // x increases from -1.5 to 1.5 (prints left to right)
         for (float x = -1.5f; x < 1.5f; x += 0.05f)
         {
 
-            // ºËĞÄ·½³ÌĞŞÕı£º(x^2 + y^2 - 1)^3 - x^2*y^3 <= 0
-            // ÕâÀï¶ÔxºÍy×öÁËÎ¢µ÷£¬Ê¹ĞÎ×´¸ü·áÂú
+            // æ ¸å¿ƒæ–¹ç¨‹ä¿®æ­£ï¼š(x^2 + y^2 - 1)^3 - x^2*y^3 <= 0
+            // è¿™é‡Œå¯¹xå’Œyåšäº†å¾®è°ƒï¼Œä½¿å½¢çŠ¶æ›´ä¸°æ»¡
+            // Core heart equation: (x^2 + y^2 - 1)^3 - x^2 * y^3 <= 0
+            // x and y are slightly tuned here for a fuller shape
             float ht = x * x + y * y - 1;
 
-            // ÎªÁËĞŞÕıÖÕ¶Ë×Ö·û¸ß¿í±È£¬¶ÔxµÄ±ÈÀı½øĞĞÎ¢µ÷
-            // ÕâÀïµÄÅĞ¶ÏÂß¼­ÊÇ£ºÈç¹ûµãÔÚĞÄĞÎÄÚ£¬´ò '*'
+            // ä¸ºäº†ä¿®æ­£ç»ˆç«¯å­—ç¬¦é«˜å®½æ¯”ï¼Œå¯¹xçš„æ¯”ä¾‹è¿›è¡Œå¾®è°ƒ
+            // è¿™é‡Œçš„åˆ¤æ–­é€»è¾‘æ˜¯ï¼šå¦‚æœç‚¹åœ¨å¿ƒå½¢å†…ï¼Œæ‰“ '*'
+            // Fine-tuning x scale to compensate for terminal character aspect ratio
+            // Condition check: print '*' if the point is inside the heart shape
             if (ht * ht * ht - x * x * y * y * y <= 0.0f)
             {
                 putchar('*');
@@ -32,7 +40,8 @@ int main()
         putchar('\n');
     }
 
-    // 3. »Ö¸´ÑÕÉ«ÉèÖÃ
+    // 3. æ¢å¤é¢œè‰²è®¾ç½®
+    // 3. Reset color settings
     printf("\033[0m");
 
 
