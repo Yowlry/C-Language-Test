@@ -2,14 +2,14 @@
 
 // 给定两个矩形，使用函数判断谁的面积更大
 // Given two rectangles, use a function to determine which one has a larger area
-double getArea1(double len, double width)
+double getArea(double len, double width)
 {
 	double area = len * width;
 	return area;
 }
 
 
-int main5()
+int main()
 {
 	// 1. 调用函数去求矩形的面积
 	// 1. Call a function to calculate the area of the rectangle
