@@ -7,7 +7,7 @@ int main()
 {
 	srand(time(NULL));
 
-	int rand_number_game = rand() % 100 + 1;
+	int rand_number = rand() % 100 + 1;
 
 	int guess;
 
@@ -16,11 +16,11 @@ int main()
 		printf("%s\n", "please enter a number to guess: ");
 		scanf("%d", &guess);
 
-		if (guess < rand_number_game)
+		if (guess < rand_number)
 		{
 			printf("%s\n", "too low");
 		}
-		else if (guess > rand_number_game)
+		else if (guess > rand_number)
 		{
 			printf("%s\n", "too high");
 		}
