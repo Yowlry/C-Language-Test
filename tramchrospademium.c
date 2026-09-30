@@ -116,7 +116,7 @@ void enter_sanctuary(Transmiragechronospatiodetachmensionalizatiorium* s, Transm
 int main() {
     printf("=== 启动高维时空逃逸协议 ===\n\n");
 
-    // 0. 初始化一个凡人（受困于现实时空和幻象中）
+    // 0. 初始化一个人类（受困于现实时空和幻象中）
     OriginalSpacetime* human = (OriginalSpacetime*)malloc(sizeof(OriginalSpacetime));
     if (!human) return -1;
     human->x = 120.15; human->y = 30.28; human->z = 5.0; // 假设在地球某处
