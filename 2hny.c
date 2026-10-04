@@ -11,7 +11,7 @@ int main()
     puts("Happy New Year!");
 
     // String array definition
-    char congratulation[16] = "Happy New Year!";
+    char congratulation[] = "Happy New Year!"; // char congratulation[16]
     printf("%s\n", congratulation);
 
     // Pointer-based output (const char *)
