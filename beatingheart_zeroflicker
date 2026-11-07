@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <math.h>
+#include <signal.h>
+#include <stdlib.h>
+
+// =========================================================================
+// 跨平台休眠与终端虚拟控制适配
+// Cross-platform sleep and virtual terminal control adaptation
+// クロスプラットフォームのスリープおよび仮想端末制御の適合
+// =========================================================================
+#ifdef _WIN32
+#include <windows.h>
+#define SLEEP_MS(ms) Sleep(ms)
+
+void init_terminal() {
+    // 启用 Windows 控制台虚拟终端转义序列 (ANSI Escape Codes)
+    // Enable Windows console virtual terminal processing (ANSI escape codes)
+    // Windowsコンソールの仮想端末シーケンス（ANSIエスケープコード）を有効化
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+}
+#else
+#include <unistd.h>
+#define SLEEP_MS(ms) usleep((ms) * 1000)
+
+void init_terminal() {}
+#endif
+
+// =========================================================================
+// 信号拦截处理：防止 Ctrl+C 中断退出后终端光标永久丢失
+// Signal handler: Prevents the cursor from remaining hidden after Ctrl+C
+// シグナルハンドラ：Ctrl+Cによる強制終了時にカーソルが非表示のまま残るのを防止
+// =========================================================================
+void handle_exit(int sig) {
+    // 恢复光标可见并重置 ANSI 颜色属性
+    // Restore cursor visibility and reset ANSI color attributes
+    // カーソルを再表示し、ANSIカラー属性をリセット
+    printf("\033[?25h\033[0m\n");
+    exit(0);
+}
+
+int main()
+{
+    init_terminal();
+    signal(SIGINT, handle_exit);
+
+    // 1. 隐藏光标并清空屏幕 (\033[?25l: 隐藏光标; \033[2J: 清屏)
+    // 1. Hide cursor and clear entire screen (\033[?25l: hide cursor; \033[2J: clear screen)
+    // 1. カーソルを非表示にし画面をクリア（\033[?25l: カーソル非表示, \033[2J: 画面消去）
+    printf("\033[?25l\033[2J");
+
+    float t = 0.0f;       // 时间变量 / Time variable / 時間変数
+    char buffer[8192];    // 帧输出缓冲区（彻底消除画面闪烁）/ Frame buffer (prevents flickering) / フレームバッファ（ちらつき防止）
+
+    while (1)
+    {
+        // 2. 双重谐波模拟真实心脏搏动（主频舒张 + 二次谐波微脉动）
+        // 2. Dual-harmonic heartbeat simulation (primary expansion + secondary micro-pulse)
+        // 2. 二重高調波による心拍動シミュレーション（主収縮＋二次高調波による微脈動）
+        float s = 1.0f + 0.12f * sinf(t) + 0.04f * sinf(2.0f * t);
+
+        char *ptr = buffer;
+
+        // \033[H: 将光标重置回首行左上角 (1, 1)，通过逐帧覆写避免滚动撕裂
+        // \033[H: Reset cursor to top-left (1, 1) to overwrite frames without scrolling tear
+        // \033[H: カーソルを左上 (1, 1) に戻し、上書き描画により画面スクロールのチラつきを防止
+        ptr += sprintf(ptr, "\033[H");
+
+        // 3. 空间坐标采样 (纵向 0.08，横向 0.04，按 2:1 适配终端等宽字符)
+        // 3. Coordinate sampling (vertical 0.08, horizontal 0.04, 2:1 ratio for terminal fonts)
+        // 3. 座標サンプリング（縦0.08、横0.04、2:1の比率で等幅フォントの縦長変形を補正）
+        for (float y = 1.4f; y >= -1.3f; y -= 0.08f)
+        {
+            for (float x = -1.4f; x <= 1.4f; x += 0.04f)
+            {
+                // 逆齐次缩放坐标：缩放因子 s 变大时空间向内收缩，呈现放大效果
+                // Inverse homogeneous scaling: as factor s increases, space scales inward to expand the shape
+                // 逆斉次スケーリング：拡大係数 s が増大すると空間が縮小され、外見上はハートが膨張する
+                float X = x / s;
+                float Y = y / s;
+
+                // 核心心形隐函数方程
+                // Core implicit heart equation: (X^2 + Y^2 - 1)^3 - X^2 * Y^3 <= 0
+                // ハート型の陰関数方程式：(X^2 + Y^2 - 1)^3 - X^2 * Y^3 <= 0
+                float ht = X * X + Y * Y - 1.0f;
+                float val = ht * ht * ht - X * X * Y * Y * Y;
+
+                if (val <= 0.0f)
+                {
+                    // 4. 双层渲染：核心致密区为高亮粗体红，边缘为平滑暗红
+                    // 4. Dual-layer rendering: Bold bright red for core, standard red for edges
+                    // 4. 2層レンダリング：中心部は太字の明赤色、輪郭部は標準の暗赤色
+                    if (val < -0.3f) {
+                        ptr += sprintf(ptr, "\033[1;31m@"); // 致密核心 / Dense core / 高密度中心部
+                    } else {
+                        ptr += sprintf(ptr, "\033[0;31m*"); // 外部轮廓 / Outer contour / 外郭部
+                    }
+                }
+                else
+                {
+                    *ptr++ = ' '; // 外部空白 / Outer space / 外部空白
+                }
+            }
+            *ptr++ = '\n';
+        }
+
+        // 5. 将整帧单次推入标准输出，锁定刷新频率约 30 FPS
+        // 5. Flush entire frame to stdout at once, locked at ~30 FPS
+        // 5. フレーム全体をstdoutへ一括出力し、描画速度を約30 FPSに制御
+        *ptr = '\0';
+        fputs(buffer, stdout);
+        fflush(stdout);
+
+        // 时间步进与帧间隔
+        // Time progression and frame interval
+        // 時間進行とフレーム間隔制御
+        t += 0.15f;
+        SLEEP_MS(33);
+    }
+
+    return 0;
+}
