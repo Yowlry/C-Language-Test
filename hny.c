@@ -6,6 +6,7 @@ int main()
 {
     // Direct output using printf()
     printf("%s\n", "Happy New Year!");
+    printf("Happy New Year!\n");
 
     // Output via puts() function
     puts("Happy New Year!");
